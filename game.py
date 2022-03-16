@@ -1,19 +1,12 @@
-# tests/test_game.py
-import unittest
 import string
-from game import Game
+import random
+import requests
 
-class TestGame(unittest.TestCase):
-    def test_game_initialization(self):
-        new_game = Game()
-        grid = new_game.grid
-        self.assertIsInstance(grid, list)
-        self.assertEqual(len(grid), 9)
-        for letter in grid:
-            self.assertIn(letter, string.ascii_uppercase)
-# game.py
-
-# [...]
+class Game:
+    def __init__(self):
+        self.grid = []
+        for _ in range(9):
+            self.grid.append(random.choice(string.ascii_uppercase))
 
     def is_valid(self, word):
         if not word:
@@ -24,4 +17,10 @@ class TestGame(unittest.TestCase):
                 letters.remove(letter)
             else:
                 return False
-        return True
+        return self.__check_dictionary(word)
+
+    @staticmethod
+    def __check_dictionary(word):
+        response = requests.get(f"https://wagon-dictionary.herokuapp.com/{word}")
+        json_response = response.json()
+        return json_response['found']
